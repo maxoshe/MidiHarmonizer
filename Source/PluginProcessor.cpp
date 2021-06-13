@@ -132,8 +132,6 @@ bool MidiHarmonizerAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 void MidiHarmonizerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     buffer.clear();
-    myMidiProcessor.setMode(modeChoice);
-    myMidiProcessor.populateKeyArray(keyChoice, keyIsMinorChoice);
     myMidiProcessor.process(midiMessages);
 }
 

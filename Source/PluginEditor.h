@@ -32,18 +32,14 @@ private:
     // access the processor object that created it.
     MidiHarmonizerAudioProcessor& audioProcessor;
     
-    //old interface
-    juce::ComboBox keyBox;
-    juce::ComboBox keyMinorMajorBox;
-    juce::ComboBox intervalBox;
-    
-    //new interface
     juce::TextButton transposeButton;
     juce::TextButton chordsButton;
     juce::TextButton chordsInKeyButton;
-    
     juce::ComboBox transposeBox;
     juce::ComboBox chordsBox;
+    juce::ComboBox chordFormulaBox;
+    juce::ComboBox keyBox;
+    juce::ComboBox keyMinorMajorBox;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiHarmonizerAudioProcessorEditor)
     

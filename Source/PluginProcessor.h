@@ -17,9 +17,7 @@
 class MidiHarmonizerAudioProcessor  : public juce::AudioProcessor
 {
 public:
-    int modeChoice;
-    int keyChoice;
-    bool keyIsMinorChoice;
+    MidiProcessor myMidiProcessor;
     
     //==============================================================================
     MidiHarmonizerAudioProcessor();
@@ -59,8 +57,6 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
-    
-    MidiProcessor myMidiProcessor;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiHarmonizerAudioProcessor)
 };

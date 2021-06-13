@@ -61,14 +61,14 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
     chordsInKeyButton.setToggleState(1, juce::dontSendNotification);
     addAndMakeVisible(chordsInKeyButton);
     
-    intervalBox.addItem("1-5", 1);
-    intervalBox.addItem("1-3-5", 2);
-    intervalBox.addItem("1-3-5-7", 3);
-    intervalBox.addItem("1-4-5", 4);
-    intervalBox.addItem("1-4-7", 5);
-    intervalBox.setSelectedId(1);
-    intervalBox.addListener(this);
-    addAndMakeVisible(intervalBox);
+    chordFormulaBox.addItem("1-5", 1);
+    chordFormulaBox.addItem("1-3-5", 2);
+    chordFormulaBox.addItem("1-3-5-7", 3);
+    chordFormulaBox.addItem("1-4-5", 4);
+    chordFormulaBox.addItem("1-4-7", 5);
+    chordFormulaBox.setSelectedId(1);
+    chordFormulaBox.addListener(this);
+    addAndMakeVisible(chordFormulaBox);
     
     keyBox.addItem("C", 12);
     keyBox.addItem("C# / Db", 13);
@@ -117,7 +117,7 @@ void MidiHarmonizerAudioProcessorEditor::paint (juce::Graphics& g)
     keyBox.setBounds(250, 170, 150, 20);
     keyMinorMajorBox.setBounds(400, 170, 150, 20);
     g.drawText("Chord Formula", 250, 190, 300, 20, juce::Justification::centredBottom);
-    intervalBox.setBounds(250, 210, 300, 20);
+    chordFormulaBox.setBounds(250, 210, 300, 20);
 }
 
 void MidiHarmonizerAudioProcessorEditor::resized()
@@ -128,10 +128,13 @@ void MidiHarmonizerAudioProcessorEditor::resized()
 
 void MidiHarmonizerAudioProcessorEditor::comboBoxChanged(juce::ComboBox *comboBox)
 {
+    //transpose mode
+    audioProcessor.myMidiProcessor.setSemitones(transposeBox.getSelectedId() - 100);
     
+    //chords mode
+    audioProcessor.myMidiProcessor.setChordTypeID(chordsBox.getSelectedId());
     
-    //old
-    audioProcessor.modeChoice = intervalBox.getSelectedId();
-    audioProcessor.keyChoice = keyBox.getSelectedId() - 12;
-    audioProcessor.keyIsMinorChoice = keyMinorMajorBox.getSelectedId() - 1;
+    //chords in key mode
+    audioProcessor.myMidiProcessor.setChordsFormulaID(chordFormulaBox.getSelectedId());
+    audioProcessor.myMidiProcessor.populateKeyArray(keyBox.getSelectedId() - 12, keyMinorMajorBox.getSelectedId() - 1);
 }

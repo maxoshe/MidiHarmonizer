@@ -19,33 +19,17 @@ void MidiProcessor::process(juce::MidiBuffer& midiMesseges)
         auto sample = metaData.samplePosition;
         if (messege.isNoteOnOrOff())
         {
-            switch (mode) {
+            switch (modeID)
+            {
                 case 1:
-                    addStepInKey(messege, sample, 1);
-                    addStepInKey(messege, sample, 5);
+                    transposeMode(messege, sample);
                     break;
                 case 2:
-                    addStepInKey(messege, sample, 1);
-                    addStepInKey(messege, sample, 3);
-                    addStepInKey(messege, sample, 5);
+                    chordMode(messege, sample);
                     break;
                 case 3:
-                    addStepInKey(messege, sample, 1);
-                    addStepInKey(messege, sample, 3);
-                    addStepInKey(messege, sample, 5);
-                    addStepInKey(messege, sample, 7);
+                    chordsInKeyMode(messege, sample);
                     break;
-                case 4:
-                    addStepInKey(messege, sample, 1);
-                    addStepInKey(messege, sample, 4);
-                    addStepInKey(messege, sample, 5);
-                    break;
-                case 5:
-                    addStepInKey(messege, sample, 1);
-                    addStepInKey(messege, sample, 4);
-                    addStepInKey(messege, sample, 7);
-                    break;
-                    
                 default:
                     break;
             }
@@ -57,6 +41,105 @@ void MidiProcessor::process(juce::MidiBuffer& midiMesseges)
         
     }
     midiMesseges.swapWith(processedMidi);
+}
+
+void MidiProcessor::transposeMode(juce::MidiMessage messege, int sample)
+{
+    addFixedInterval(messege, sample, semitones);
+}
+void MidiProcessor::chordMode(juce::MidiMessage messege, int sample)
+{
+    switch (chordTypeID) {
+        case 10:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 7);
+            break;
+        case 11:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 4);
+            addFixedInterval(messege, sample, 7);
+            break;
+        case 12:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 3);
+            addFixedInterval(messege, sample, 7);
+            break;
+        case 13:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 4);
+            addFixedInterval(messege, sample, 7);
+            addFixedInterval(messege, sample, 11);
+            break;
+        case 14:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 3);
+            addFixedInterval(messege, sample, 7);
+            addFixedInterval(messege, sample, 10);
+            break;
+        case 15:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 4);
+            addFixedInterval(messege, sample, 7);
+            addFixedInterval(messege, sample, 10);
+            break;
+        case 16:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 4);
+            addFixedInterval(messege, sample, 8);
+            break;
+        case 17:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 4);
+            addFixedInterval(messege, sample, 6);
+            break;
+        case 18:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 3);
+            addFixedInterval(messege, sample, 6);
+            addFixedInterval(messege, sample, 10);
+            break;
+        case 19:
+            addFixedInterval(messege, sample, 0);
+            addFixedInterval(messege, sample, 3);
+            addFixedInterval(messege, sample, 6);
+            addFixedInterval(messege, sample, 9);
+            break;
+        default:
+            break;
+    }
+}
+void MidiProcessor::chordsInKeyMode(juce::MidiMessage messege, int sample)
+{
+    switch (chordFormulaID)
+    {
+        case 1:
+            addStepInKey(messege, sample, 1);
+            addStepInKey(messege, sample, 5);
+            break;
+        case 2:
+            addStepInKey(messege, sample, 1);
+            addStepInKey(messege, sample, 3);
+            addStepInKey(messege, sample, 5);
+            break;
+        case 3:
+            addStepInKey(messege, sample, 1);
+            addStepInKey(messege, sample, 3);
+            addStepInKey(messege, sample, 5);
+            addStepInKey(messege, sample, 7);
+            break;
+        case 4:
+            addStepInKey(messege, sample, 1);
+            addStepInKey(messege, sample, 4);
+            addStepInKey(messege, sample, 5);
+            break;
+        case 5:
+            addStepInKey(messege, sample, 1);
+            addStepInKey(messege, sample, 4);
+            addStepInKey(messege, sample, 7);
+            break;
+        default:
+            break;
+    }
 }
 
 void MidiProcessor::addFixedInterval(juce::MidiMessage messege, int sample, int interval)
@@ -127,7 +210,20 @@ bool MidiProcessor::inKey(int note)
     return inKey;
 }
 
-void MidiProcessor::setMode(int choice)
+void MidiProcessor::setModeID(int choice)
 {
-    mode = choice;
+    modeID = choice;
+}
+
+void MidiProcessor::setSemitones(int choice)
+{
+    semitones = choice;
+}
+void MidiProcessor::setChordTypeID(int choice)
+{
+    chordTypeID = choice;
+}
+void MidiProcessor::setChordsFormulaID(int choice)
+{
+    chordFormulaID = choice;
 }
