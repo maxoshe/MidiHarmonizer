@@ -39,7 +39,7 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
     
     //Chords
     chordsButton.setButtonText("Chords");
-    chordsButton.setToggleState(1, juce::dontSendNotification);
+    chordsButton.setToggleState(0, juce::dontSendNotification);
     addAndMakeVisible(chordsButton);
     
     chordsBox.addItem("5th", 10);
@@ -58,7 +58,7 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
 
     //Chords in Key
     chordsInKeyButton.setButtonText("Chords In Key");
-    chordsInKeyButton.setToggleState(1, juce::dontSendNotification);
+    chordsInKeyButton.setToggleState(0, juce::dontSendNotification);
     addAndMakeVisible(chordsInKeyButton);
     
     chordFormulaBox.addItem("1-5", 1);

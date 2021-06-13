@@ -15,20 +15,20 @@ void MidiProcessor::process(juce::MidiBuffer& midiMesseges)
     processedMidi.clear();
     for (const auto metaData : midiMesseges)
     {
-        auto messege = metaData.getMessage();
-        auto sample = metaData.samplePosition;
+        messege = metaData.getMessage();
+        sample = metaData.samplePosition;
         if (messege.isNoteOnOrOff())
         {
             switch (modeID)
             {
                 case 1:
-                    transposeMode(messege, sample);
+                    transposeMode();
                     break;
                 case 2:
-                    chordMode(messege, sample);
+                    chordMode();
                     break;
                 case 3:
-                    chordsInKeyMode(messege, sample);
+                    chordsInKeyMode();
                     break;
                 default:
                     break;
@@ -43,11 +43,11 @@ void MidiProcessor::process(juce::MidiBuffer& midiMesseges)
     midiMesseges.swapWith(processedMidi);
 }
 
-void MidiProcessor::transposeMode(juce::MidiMessage messege, int sample)
+void MidiProcessor::transposeMode()
 {
     addFixedInterval(messege, sample, semitones);
 }
-void MidiProcessor::chordMode(juce::MidiMessage messege, int sample)
+void MidiProcessor::chordMode()
 {
     switch (chordTypeID) {
         case 10:
@@ -108,7 +108,7 @@ void MidiProcessor::chordMode(juce::MidiMessage messege, int sample)
             break;
     }
 }
-void MidiProcessor::chordsInKeyMode(juce::MidiMessage messege, int sample)
+void MidiProcessor::chordsInKeyMode()
 {
     switch (chordFormulaID)
     {

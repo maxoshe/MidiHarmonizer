@@ -19,10 +19,13 @@ private:
     const int cMajor[7] = {0, 2, 4, 5, 7, 9, 11};
     const int cMinor[7] = {0, 2, 3, 5, 7, 8, 10};
     
-    int modeID = 2;
+    int modeID = 3;
     int semitones;
     int chordTypeID;
     int chordFormulaID;
+    
+    juce::MidiMessage messege;
+    int sample;
     
     std::vector<int> pitchesInKey;
     juce::MidiBuffer processedMidi;
@@ -34,9 +37,9 @@ private:
     //checks if a note is in key of choice
     bool inKey(int note);
 
-    void transposeMode(juce::MidiMessage messege, int sample);
-    void chordMode(juce::MidiMessage messege, int sample);
-    void chordsInKeyMode(juce::MidiMessage messege, int sample);
+    void transposeMode();
+    void chordMode();
+    void chordsInKeyMode();
     
 public:
     void setModeID(int choice);
