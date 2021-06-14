@@ -26,11 +26,13 @@ public:
     void resized() override;
     
     void comboBoxChanged(juce::ComboBox *comboBox) override;
+    void updateToggleState(juce::Button *button);
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     MidiHarmonizerAudioProcessor& audioProcessor;
+    
     
     juce::TextButton transposeButton;
     juce::TextButton chordsButton;

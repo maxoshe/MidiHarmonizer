@@ -15,9 +15,16 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
 {
     setSize(600, 300);
     
+    
     //Transpose
     transposeButton.setButtonText("Transpose");
     transposeButton.setToggleState(1, juce::dontSendNotification);
+    transposeButton.setRadioGroupId(100);
+    transposeButton.onClick = [this]
+    {
+        updateToggleState(&transposeButton);
+        audioProcessor.myMidiProcessor.setModeID(1);
+    };
     addAndMakeVisible(transposeButton);
     
     transposeBox.addItem("0 / Unison", 100);
@@ -40,6 +47,12 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
     //Chords
     chordsButton.setButtonText("Chords");
     chordsButton.setToggleState(0, juce::dontSendNotification);
+    chordsButton.setRadioGroupId(100);
+    chordsButton.onClick = [this]
+    {
+        updateToggleState(&chordsButton);
+        audioProcessor.myMidiProcessor.setModeID(2);
+    };
     addAndMakeVisible(chordsButton);
     
     chordsBox.addItem("5th", 10);
@@ -59,6 +72,12 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
     //Chords in Key
     chordsInKeyButton.setButtonText("Chords In Key");
     chordsInKeyButton.setToggleState(0, juce::dontSendNotification);
+    chordsInKeyButton.setRadioGroupId(100);
+    chordsInKeyButton.onClick = [this]
+    {
+        updateToggleState(&chordsInKeyButton);
+        audioProcessor.myMidiProcessor.setModeID(3);
+    };
     addAndMakeVisible(chordsInKeyButton);
     
     chordFormulaBox.addItem("1-5", 1);
@@ -137,4 +156,9 @@ void MidiHarmonizerAudioProcessorEditor::comboBoxChanged(juce::ComboBox *comboBo
     //chords in key mode
     audioProcessor.myMidiProcessor.setChordsFormulaID(chordFormulaBox.getSelectedId());
     audioProcessor.myMidiProcessor.populateKeyArray(keyBox.getSelectedId() - 12, keyMinorMajorBox.getSelectedId() - 1);
+}
+
+void MidiHarmonizerAudioProcessorEditor::updateToggleState(juce::Button *button)
+{
+    button->setToggleState(1, juce::dontSendNotification);
 }

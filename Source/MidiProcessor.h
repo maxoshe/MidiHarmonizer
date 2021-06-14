@@ -19,7 +19,7 @@ private:
     const int cMajor[7] = {0, 2, 4, 5, 7, 9, 11};
     const int cMinor[7] = {0, 2, 3, 5, 7, 8, 10};
     
-    int modeID = 3;
+    int modeID = 1;
     int semitones;
     int chordTypeID;
     int chordFormulaID;
