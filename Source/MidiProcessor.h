@@ -23,6 +23,7 @@ private:
     int semitones;
     int chordTypeID;
     int chordFormulaID;
+    int noteStatus[128] = {0};
     
     juce::MidiMessage messege;
     int sample;
@@ -36,6 +37,10 @@ private:
     void addStepInKey(juce::MidiMessage messege, int sample, int step);
     //checks if a note is in key of choice
     bool inKey(int note);
+    //update note status array based on messege
+    void updateNoteStatusArray(juce::MidiMessage& messege);
+    //check if the note should be on or off based on note status array and messege
+    bool noteIsNotInDesiredStatus(juce::MidiMessage& messege);
 
     void transposeMode();
     void chordMode();

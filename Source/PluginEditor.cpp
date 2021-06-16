@@ -85,7 +85,7 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
     chordFormulaBox.addItem("1-3-5-7", 3);
     chordFormulaBox.addItem("1-4-5", 4);
     chordFormulaBox.addItem("1-4-7", 5);
-    chordFormulaBox.setSelectedId(1);
+    chordFormulaBox.setSelectedId(2);
     chordFormulaBox.addListener(this);
     addAndMakeVisible(chordFormulaBox);
     

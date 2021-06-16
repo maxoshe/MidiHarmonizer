@@ -145,7 +145,11 @@ void MidiProcessor::chordsInKeyMode()
 void MidiProcessor::addFixedInterval(juce::MidiMessage messege, int sample, int interval)
 {
     messege.setNoteNumber(messege.getNoteNumber() + interval);
-    processedMidi.addEvent(messege, sample);
+    if (noteIsNotInDesiredStatus(messege))
+    {
+        processedMidi.addEvent(messege, sample);
+    }
+    updateNoteStatusArray(messege);
 }
 
 void MidiProcessor::addStepInKey(juce::MidiMessage messege, int sample, int step)
@@ -166,7 +170,38 @@ void MidiProcessor::addStepInKey(juce::MidiMessage messege, int sample, int step
         }
     }
     messege.setNoteNumber(noteNum + midiInterval);
-    processedMidi.addEvent(messege, sample);
+    if (noteIsNotInDesiredStatus(messege))
+    {
+        processedMidi.addEvent(messege, sample);
+    }
+    updateNoteStatusArray(messege);
+}
+
+void MidiProcessor::updateNoteStatusArray(juce::MidiMessage& messege)
+{
+    int note = messege.getNoteNumber();
+    if (messege.isNoteOn())
+    {
+        noteStatus[note] = noteStatus[note] + 1;
+    }
+    if (messege.isNoteOff())
+    {
+        noteStatus[note] = noteStatus[note] - 1;
+    }
+}
+
+bool MidiProcessor::noteIsNotInDesiredStatus(juce::MidiMessage& messege)
+{
+    int note = messege.getNoteNumber();
+    if (messege.isNoteOn() and noteStatus[note]==0)
+    {
+        return true;
+    }
+    if (messege.isNoteOff() and noteStatus[note]==1)
+    {
+        return true;
+    }
+    return false;
 }
 
 void MidiProcessor::populateKeyArray(int keyOffset, bool keyIsMinor)
