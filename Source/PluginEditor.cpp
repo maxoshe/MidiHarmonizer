@@ -13,21 +13,156 @@
 MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarmonizerAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    setSize(600, 300);
+    setSize(mainWindowWidth, mainWindowHeight);
+    setupTheme();
+    setupRectangles();
     
+    //Transpose mode gui
+    //==============================================================================
+    setupTransposeButton();
+    setupTransposeBox();
+    addAndMakeVisible(transposeButton);
+    addAndMakeVisible(transposeBox);
     
-    //Transpose
+    //Chords mode gui
+    //==============================================================================
+    setupChordsButton();
+    setupChordsBox();
+    addAndMakeVisible(chordsButton);
+    addAndMakeVisible(chordsBox);
+    
+    //Chords in Key mode gui
+    //==============================================================================
+    setupChordsInKeyButton();
+    setupKeyBoxes();
+    setupChordFormulaBox();
+    addAndMakeVisible(chordsInKeyButton);
+    addAndMakeVisible(keyBox);
+    addAndMakeVisible(keyMinorMajorBox);
+    addAndMakeVisible(chordFormulaBox);
+}
+
+MidiHarmonizerAudioProcessorEditor::~MidiHarmonizerAudioProcessorEditor()
+{
+}
+
+//==============================================================================
+void MidiHarmonizerAudioProcessorEditor::paint (juce::Graphics& g)
+{
+    g.setColour(leftBgColour);
+    g.fillRect(leftPanel);
+    g.setColour(rightBgColour);
+    g.fillRect(rightPanel);
+    g.setColour(textColour);
+    
+    transposeButton.setBounds(buttonRect);
+    transposeButton.setCentrePosition(leftPanel.getCentre().getX(),
+                                      topPanel.getCentre().getY());
+    
+    chordsButton.setBounds(buttonRect);
+    chordsButton.setCentrePosition(leftPanel.getCentre().getX(),
+                                   topCentrePanel.getCentre().getY());
+    
+    chordsInKeyButton.setBounds(buttonRect);
+    chordsInKeyButton.setCentrePosition(leftPanel.getCentre().getX(),
+                                        bottomCentrePanel.getCentre().getY());
+    
+    transposeBox.setBounds(boxRect);
+    transposeBox.setCentrePosition(rightPanel.getCentre().getX(),
+                                   topPanel.getCentre().getY());
+    
+    chordsBox.setBounds(boxRect);
+    chordsBox.setCentrePosition(rightPanel.getCentre().getX(),
+                                topCentrePanel.getCentre().getY());
+    
+    keyBox.setSize(boxRect.getWidth()/2, boxRect.getHeight());
+    keyBox.setTopLeftPosition(chordsBox.getX(),
+                              bottomCentrePanel.getCentre().getY() - boxRect.getHeight()/2);
+    
+    keyMinorMajorBox.setSize(boxRect.getWidth()/2, boxRect.getHeight());
+    keyMinorMajorBox.setTopLeftPosition(chordsBox.getX()+boxRect.getWidth()/2,
+                                        bottomCentrePanel.getCentre().getY() - boxRect.getHeight()/2);
+    
+    chordFormulaBox.setBounds(boxRect);
+    chordFormulaBox.setCentrePosition(rightPanel.getCentre().getX(),
+                                      bottomPanel.getCentre().getY());
+}
+
+void MidiHarmonizerAudioProcessorEditor::resized()
+{
+    setSize(mainWindowWidth, mainWindowHeight);
+}
+
+void MidiHarmonizerAudioProcessorEditor::comboBoxChanged(juce::ComboBox *comboBox)
+{
+    //transpose mode
+    audioProcessor.myMidiProcessor.setSemitones(transposeBox.getSelectedId() - 100);
+    
+    //chords mode
+    audioProcessor.myMidiProcessor.setChordTypeID(chordsBox.getSelectedId());
+    
+    //chords in key mode
+    audioProcessor.myMidiProcessor.setChordsFormulaID(chordFormulaBox.getSelectedId());
+    audioProcessor.myMidiProcessor.populateKeyArray(keyBox.getSelectedId() - 12,
+                                                    keyMinorMajorBox.getSelectedId() - 1);
+}
+
+void MidiHarmonizerAudioProcessorEditor::setupTransposeButton()
+{
     transposeButton.setButtonText("Transpose");
     transposeButton.setToggleState(1, juce::dontSendNotification);
     transposeButton.setRadioGroupId(100);
     transposeButton.onClick = [this]
     {
-        updateToggleState(&transposeButton);
+        transposeButton.setToggleState(1, juce::dontSendNotification);
         audioProcessor.myMidiProcessor.setModeID(1);
+        transposeBox.setEnabled(1);
+        chordsBox.setEnabled(0);
+        keyBox.setEnabled(0);
+        keyMinorMajorBox.setEnabled(0);
+        chordFormulaBox.setEnabled(0);
     };
-    addAndMakeVisible(transposeButton);
-    
-    transposeBox.addItem("0 / Unison", 100);
+}
+
+void MidiHarmonizerAudioProcessorEditor::setupChordsButton()
+{
+    chordsButton.setButtonText("Chords");
+    chordsButton.setToggleState(0, juce::dontSendNotification);
+    chordsButton.setRadioGroupId(100);
+    chordsButton.onClick = [this]
+    {
+        chordsButton.setToggleState(1, juce::dontSendNotification);
+        audioProcessor.myMidiProcessor.setModeID(2);
+        transposeBox.setEnabled(0);
+        chordsBox.setEnabled(1);
+        keyBox.setEnabled(0);
+        keyMinorMajorBox.setEnabled(0);
+        chordFormulaBox.setEnabled(0);
+    };
+}
+
+void MidiHarmonizerAudioProcessorEditor::setupChordsInKeyButton()
+{
+    chordsInKeyButton.setButtonText("Chords In Key");
+    chordsInKeyButton.setToggleState(0, juce::dontSendNotification);
+    chordsInKeyButton.setRadioGroupId(100);
+    chordsInKeyButton.onClick = [this]
+    {
+        chordsInKeyButton.setToggleState(1, juce::dontSendNotification);
+        audioProcessor.myMidiProcessor.setModeID(3);
+        transposeBox.setEnabled(0);
+        chordsBox.setEnabled(0);
+        keyBox.setEnabled(1);
+        keyMinorMajorBox.setEnabled(1);
+        chordFormulaBox.setEnabled(1);
+    };
+}
+
+void MidiHarmonizerAudioProcessorEditor::setupTransposeBox()
+{
+    transposeLabel.setText("Semitones / Interval", juce::dontSendNotification);
+    transposeLabel.attachToComponent(&transposeBox, 0);
+    transposeBox.addItem("0 / Unison", 100); 
     transposeBox.addItem("1 / Minor 2nd", 101);
     transposeBox.addItem("2 / Major 2nd", 102);
     transposeBox.addItem("3 / Minor 3d", 103);
@@ -42,19 +177,12 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
     transposeBox.addItem("12 / Octave", 112);
     transposeBox.setSelectedId(100);
     transposeBox.addListener(this);
-    addAndMakeVisible(transposeBox);
-    
-    //Chords
-    chordsButton.setButtonText("Chords");
-    chordsButton.setToggleState(0, juce::dontSendNotification);
-    chordsButton.setRadioGroupId(100);
-    chordsButton.onClick = [this]
-    {
-        updateToggleState(&chordsButton);
-        audioProcessor.myMidiProcessor.setModeID(2);
-    };
-    addAndMakeVisible(chordsButton);
-    
+}
+
+void MidiHarmonizerAudioProcessorEditor::setupChordsBox()
+{
+    chordsLabel.setText("Chord", juce::dontSendNotification);
+    chordsLabel.attachToComponent(&chordsBox, 0);
     chordsBox.addItem("5th", 10);
     chordsBox.addItem("Major", 11);
     chordsBox.addItem("Minor", 12);
@@ -66,29 +194,14 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
     chordsBox.addItem("Half Diminished 7th", 18);
     chordsBox.addItem("Diminished 7th", 19);
     chordsBox.setSelectedId(11);
+    chordsBox.setEnabled(0);
     chordsBox.addListener(this);
-    addAndMakeVisible(chordsBox);
+}
 
-    //Chords in Key
-    chordsInKeyButton.setButtonText("Chords In Key");
-    chordsInKeyButton.setToggleState(0, juce::dontSendNotification);
-    chordsInKeyButton.setRadioGroupId(100);
-    chordsInKeyButton.onClick = [this]
-    {
-        updateToggleState(&chordsInKeyButton);
-        audioProcessor.myMidiProcessor.setModeID(3);
-    };
-    addAndMakeVisible(chordsInKeyButton);
-    
-    chordFormulaBox.addItem("1-5", 1);
-    chordFormulaBox.addItem("1-3-5", 2);
-    chordFormulaBox.addItem("1-3-5-7", 3);
-    chordFormulaBox.addItem("1-4-5", 4);
-    chordFormulaBox.addItem("1-4-7", 5);
-    chordFormulaBox.setSelectedId(2);
-    chordFormulaBox.addListener(this);
-    addAndMakeVisible(chordFormulaBox);
-    
+void MidiHarmonizerAudioProcessorEditor::setupKeyBoxes()
+{
+    keyLabel.setText("Key", juce::dontSendNotification);
+    keyLabel.attachToComponent(&keyBox, 0);
     keyBox.addItem("C", 12);
     keyBox.addItem("C# / Db", 13);
     keyBox.addItem("D", 14);
@@ -102,63 +215,80 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
     keyBox.addItem("A# / Bb", 22);
     keyBox.addItem("B", 23);
     keyBox.setSelectedId(12);
+    keyBox.setEnabled(0);
     keyBox.addListener(this);
-    addAndMakeVisible(keyBox);
     
     keyMinorMajorBox.addItem("Major", 1);
     keyMinorMajorBox.addItem("Minor", 2);
     keyMinorMajorBox.setSelectedId(1);
     keyMinorMajorBox.addListener(this);
-    addAndMakeVisible(keyMinorMajorBox);
-    
+    keyMinorMajorBox.setEnabled(0);
 }
 
-MidiHarmonizerAudioProcessorEditor::~MidiHarmonizerAudioProcessorEditor()
+void MidiHarmonizerAudioProcessorEditor::setupChordFormulaBox()
 {
+    chordFormulaLabel.setText("Chord Formula", juce::dontSendNotification);
+    chordFormulaLabel.attachToComponent(&chordFormulaBox, 0);
+    chordFormulaBox.addItem("1-5", 1);
+    chordFormulaBox.addItem("1-3-5", 2);
+    chordFormulaBox.addItem("1-3-5-7", 3);
+    chordFormulaBox.addItem("1-4-5", 4);
+    chordFormulaBox.addItem("1-4-7", 5);
+    chordFormulaBox.setSelectedId(2);
+    chordFormulaBox.setEnabled(0);
+    chordFormulaBox.addListener(this);
 }
 
-//==============================================================================
-void MidiHarmonizerAudioProcessorEditor::paint (juce::Graphics& g)
+void MidiHarmonizerAudioProcessorEditor::setupTheme()
 {
-    g.fillAll(juce::Colours::lightslategrey.brighter(3));
+    getLookAndFeel().setColour(juce::ComboBox::outlineColourId,
+                               juce::Colours::transparentBlack);
     
-    transposeButton.setBounds(50, 50, 150, 40);
-    g.drawText("Semitones / Interval", 250, 50, 300, 20, juce::Justification::centredBottom);
-    transposeBox.setBounds(250, 70, 300, 20);
+    getLookAndFeel().setColour(juce::ComboBox::textColourId,
+                               textColour);
     
+    getLookAndFeel().setColour(juce::PopupMenu::textColourId,
+                               textColour);
     
-    chordsButton.setBounds(50, 100, 150, 40);
-    g.drawText("Chord Type", 250, 100, 300, 20, juce::Justification::centredBottom);
-    chordsBox.setBounds(250, 120, 300, 20);
+    getLookAndFeel().setColour(juce::TextButton::textColourOnId,
+                               textColour);
     
-    chordsInKeyButton.setBounds(50, 150, 150, 80);
-    g.drawText("Key", 250, 150, 300, 20, juce::Justification::centredBottom);
-    keyBox.setBounds(250, 170, 150, 20);
-    keyMinorMajorBox.setBounds(400, 170, 150, 20);
-    g.drawText("Chord Formula", 250, 190, 300, 20, juce::Justification::centredBottom);
-    chordFormulaBox.setBounds(250, 210, 300, 20);
+    getLookAndFeel().setColour(juce::TextButton::textColourOnId,
+                               textColour);
+    
+    getLookAndFeel().setColour(juce::TextButton::textColourOffId,
+                               textColour);
+    
+    getLookAndFeel().setColour(juce::Label::textColourId,
+                               textColour);
+    
+    getLookAndFeel().setColour(juce::ComboBox::backgroundColourId,
+                               comboBoxColour);
+    
+    getLookAndFeel().setColour(juce::PopupMenu::backgroundColourId,
+                               rightBgColour.withAlpha(0.8f));
+    
+    getLookAndFeel().setColour(juce::PopupMenu::highlightedBackgroundColourId,
+                               comboBoxColour);
+    
+    getLookAndFeel().setColour(juce::TextButton::buttonColourId,
+                               leftBgColour);
+    
+    getLookAndFeel().setColour(juce::TextButton::buttonOnColourId,
+                               buttonOnColour);
 }
 
-void MidiHarmonizerAudioProcessorEditor::resized()
+void MidiHarmonizerAudioProcessorEditor::setupRectangles()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
-}
-
-void MidiHarmonizerAudioProcessorEditor::comboBoxChanged(juce::ComboBox *comboBox)
-{
-    //transpose mode
-    audioProcessor.myMidiProcessor.setSemitones(transposeBox.getSelectedId() - 100);
+    leftPanel = getBounds().withRight(getWidth()/3);
+    rightPanel = getBounds().withLeft(getWidth()/3);
     
-    //chords mode
-    audioProcessor.myMidiProcessor.setChordTypeID(chordsBox.getSelectedId());
+    topPanel = getBounds().withBottom(getHeight()/4);
+    topCentrePanel = getBounds().withTop(getHeight()/4).withBottom(getHeight()*2/4);
+    bottomCentrePanel = getBounds().withTop(getHeight()*2/4).withBottom(getHeight()*3/4);
+    bottomPanel = getBounds().withTop(getHeight()*3/4);
     
-    //chords in key mode
-    audioProcessor.myMidiProcessor.setChordsFormulaID(chordFormulaBox.getSelectedId());
-    audioProcessor.myMidiProcessor.populateKeyArray(keyBox.getSelectedId() - 12, keyMinorMajorBox.getSelectedId() - 1);
-}
-
-void MidiHarmonizerAudioProcessorEditor::updateToggleState(juce::Button *button)
-{
-    button->setToggleState(1, juce::dontSendNotification);
+    
+    buttonRect = getBounds().withSize(buttonWidth, buttonHeight);
+    boxRect = getBounds().withSize(boxWidth, boxHeight);
 }
