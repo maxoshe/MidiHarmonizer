@@ -40,12 +40,19 @@ private:
     
     const int mainWindowWidth = 500;
     const int mainWindowHeight = 250;
-    const int buttonWidth = 150;
+    const int buttonWidth = 80;
     const int buttonHeight = 40;
     const int boxWidth = 300;
     const int boxHeight = 20;
+    const int boxHorzPad = 10;
     
-    juce::Rectangle<int> leftPanel ,rightPanel, topPanel, topCentrePanel, bottomCentrePanel, bottomPanel, buttonRect, boxRect;
+    const juce::FlexItem::Margin buttonMargin  = juce::FlexItem::Margin(0, 0, 10, 0);
+    const juce::FlexItem::Margin boxMargin  = juce::FlexItem::Margin(20, 0, 10, 0);
+    
+    juce::FlexBox leftFlexBox, rightFlexBox, keyFlexBox;
+    juce::Array<juce::FlexItem> leftItems, rightItems, keyItems;
+    
+    juce::Rectangle<int> leftPanel ,rightPanel;
     
     juce::TextButton transposeButton, chordsButton, chordsInKeyButton;
     juce::ComboBox transposeBox, chordsBox, chordFormulaBox, keyBox, keyMinorMajorBox;
@@ -60,6 +67,7 @@ private:
     void setupChordFormulaBox();
     void setupTheme();
     void setupRectangles();
+    void setupFlexBox();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiHarmonizerAudioProcessorEditor)
     

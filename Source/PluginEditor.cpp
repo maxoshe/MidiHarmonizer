@@ -15,7 +15,7 @@ MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarm
 {
     setSize(mainWindowWidth, mainWindowHeight);
     setupTheme();
-    setupRectangles();
+    setupFlexBox();
     
     //Transpose mode gui
     //==============================================================================
@@ -49,48 +49,25 @@ MidiHarmonizerAudioProcessorEditor::~MidiHarmonizerAudioProcessorEditor()
 //==============================================================================
 void MidiHarmonizerAudioProcessorEditor::paint (juce::Graphics& g)
 {
+    setupRectangles();
     g.setColour(leftBgColour);
     g.fillRect(leftPanel);
     g.setColour(rightBgColour);
     g.fillRect(rightPanel);
-    g.setColour(textColour);
-    
-    transposeButton.setBounds(buttonRect);
-    transposeButton.setCentrePosition(leftPanel.getCentre().getX(),
-                                      topPanel.getCentre().getY());
-    
-    chordsButton.setBounds(buttonRect);
-    chordsButton.setCentrePosition(leftPanel.getCentre().getX(),
-                                   topCentrePanel.getCentre().getY());
-    
-    chordsInKeyButton.setBounds(buttonRect);
-    chordsInKeyButton.setCentrePosition(leftPanel.getCentre().getX(),
-                                        bottomCentrePanel.getCentre().getY());
-    
-    transposeBox.setBounds(boxRect);
-    transposeBox.setCentrePosition(rightPanel.getCentre().getX(),
-                                   topPanel.getCentre().getY());
-    
-    chordsBox.setBounds(boxRect);
-    chordsBox.setCentrePosition(rightPanel.getCentre().getX(),
-                                topCentrePanel.getCentre().getY());
-    
-    keyBox.setSize(boxRect.getWidth()/2, boxRect.getHeight());
-    keyBox.setTopLeftPosition(chordsBox.getX(),
-                              bottomCentrePanel.getCentre().getY() - boxRect.getHeight()/2);
-    
-    keyMinorMajorBox.setSize(boxRect.getWidth()/2, boxRect.getHeight());
-    keyMinorMajorBox.setTopLeftPosition(chordsBox.getX()+boxRect.getWidth()/2,
-                                        bottomCentrePanel.getCentre().getY() - boxRect.getHeight()/2);
-    
-    chordFormulaBox.setBounds(boxRect);
-    chordFormulaBox.setCentrePosition(rightPanel.getCentre().getX(),
-                                      bottomPanel.getCentre().getY());
+    leftFlexBox.performLayout(leftPanel.withSizeKeepingCentre(leftPanel.getWidth(),
+                                                              leftPanel.getHeight()*4/5));
+    rightFlexBox.performLayout(rightPanel.withSizeKeepingCentre(rightPanel.getWidth()-boxHorzPad,
+                                                                rightPanel.getHeight()*4/5));
 }
 
 void MidiHarmonizerAudioProcessorEditor::resized()
 {
-    setSize(mainWindowWidth, mainWindowHeight);
+    if (getWidth() < mainWindowWidth) {
+        setSize(mainWindowWidth, getHeight());
+    }
+    if (getHeight() < mainWindowHeight) {
+        setSize(getWidth(), mainWindowHeight);
+    }
 }
 
 void MidiHarmonizerAudioProcessorEditor::comboBoxChanged(juce::ComboBox *comboBox)
@@ -282,13 +259,49 @@ void MidiHarmonizerAudioProcessorEditor::setupRectangles()
 {
     leftPanel = getBounds().withRight(getWidth()/3);
     rightPanel = getBounds().withLeft(getWidth()/3);
+}
+
+void MidiHarmonizerAudioProcessorEditor::setupFlexBox()
+{
+    //left Panel
+    leftItems.add(juce::FlexItem(buttonWidth,
+                                 buttonHeight,
+                                 transposeButton).withMargin(buttonMargin));
+    leftItems.add(juce::FlexItem(buttonWidth,
+                                 buttonHeight,
+                                 chordsButton).withMargin(buttonMargin));
+    leftItems.add(juce::FlexItem(buttonWidth,
+                                 buttonHeight,
+                                 chordsInKeyButton).withMargin(buttonMargin));
+    leftFlexBox.flexDirection = juce::FlexBox::Direction::column;
+    leftFlexBox.alignContent = juce::FlexBox::AlignContent::stretch;
+    leftFlexBox.items = leftItems;
     
-    topPanel = getBounds().withBottom(getHeight()/4);
-    topCentrePanel = getBounds().withTop(getHeight()/4).withBottom(getHeight()*2/4);
-    bottomCentrePanel = getBounds().withTop(getHeight()*2/4).withBottom(getHeight()*3/4);
-    bottomPanel = getBounds().withTop(getHeight()*3/4);
     
+    //key box
+    keyItems.add(juce::FlexItem(boxWidth/2, boxHeight, keyBox));
+    keyItems.add(juce::FlexItem(boxWidth/2, boxHeight, keyMinorMajorBox));
+    keyFlexBox.flexDirection = juce::FlexBox::Direction::column;
+    keyFlexBox.flexWrap = juce::FlexBox::Wrap::wrap;
+    keyFlexBox.alignContent = juce::FlexBox::AlignContent::stretch;
+    keyFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
+    keyFlexBox.items = keyItems;
     
-    buttonRect = getBounds().withSize(buttonWidth, buttonHeight);
-    boxRect = getBounds().withSize(boxWidth, boxHeight);
+    //RightPanel
+    rightItems.add(juce::FlexItem(boxWidth,
+                                  boxHeight,
+                                  transposeBox).withMargin(boxMargin));
+    rightItems.add(juce::FlexItem(boxWidth,
+                                  boxHeight,
+                                  chordsBox).withMargin(boxMargin));
+    rightItems.add(juce::FlexItem(boxWidth,
+                                  boxHeight,
+                                  keyFlexBox).withMargin(boxMargin));
+    rightItems.add(juce::FlexItem(boxWidth,
+                                  boxHeight,
+                                  chordFormulaBox).withMargin(boxMargin));
+    rightFlexBox.flexDirection = juce::FlexBox::Direction::column;
+    rightFlexBox.alignContent = juce::FlexBox::AlignContent::stretch;
+    rightFlexBox.items = rightItems;
+    
 }
