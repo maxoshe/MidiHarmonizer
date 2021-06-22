@@ -13,26 +13,26 @@
 MidiHarmonizerAudioProcessorEditor::MidiHarmonizerAudioProcessorEditor (MidiHarmonizerAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
+    //main window
     setSize(mainWindowWidth, mainWindowHeight);
+    
+    //gui
     setupTheme();
     setupFlexBox();
     
-    //Transpose mode gui
-    //==============================================================================
+    //transpose mode components
     setupTransposeButton();
     setupTransposeBox();
     addAndMakeVisible(transposeButton);
     addAndMakeVisible(transposeBox);
     
-    //Chords mode gui
-    //==============================================================================
+    //chords mode components
     setupChordsButton();
     setupChordsBox();
     addAndMakeVisible(chordsButton);
     addAndMakeVisible(chordsBox);
     
-    //Chords in Key mode gui
-    //==============================================================================
+    //chords in key mode components
     setupChordsInKeyButton();
     setupKeyBoxes();
     setupChordFormulaBox();
@@ -277,7 +277,6 @@ void MidiHarmonizerAudioProcessorEditor::setupFlexBox()
     leftFlexBox.alignContent = juce::FlexBox::AlignContent::stretch;
     leftFlexBox.items = leftItems;
     
-    
     //key box
     keyItems.add(juce::FlexItem(boxWidth/2, boxHeight, keyBox));
     keyItems.add(juce::FlexItem(boxWidth/2, boxHeight, keyMinorMajorBox));
@@ -287,7 +286,7 @@ void MidiHarmonizerAudioProcessorEditor::setupFlexBox()
     keyFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
     keyFlexBox.items = keyItems;
     
-    //RightPanel
+    //right panel
     rightItems.add(juce::FlexItem(boxWidth,
                                   boxHeight,
                                   transposeBox).withMargin(boxMargin));
