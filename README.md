@@ -1,6 +1,6 @@
 # MidiHarmonizer
 
-![Image of standalone plugin] (img/standalone.png)
+![Image of standalone plugin](img/standalone.png)
 
 This is a midi harmonizer plugin in development.
 It can read midi data and output additional midi notes based on the user selection.
