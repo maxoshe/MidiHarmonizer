@@ -32,11 +32,13 @@ private:
     // access the processor object that created it.
     MidiHarmonizerAudioProcessor& audioProcessor;
     
-    const juce::Colour textColour = juce::Colour::fromRGB(227, 227, 227);
-    const juce::Colour rightBgColour = juce::Colour::fromRGB(34, 33, 31);
-    const juce::Colour leftBgColour = juce::Colour::fromRGB(43,42,40);
-    const juce::Colour comboBoxColour = juce::Colour::fromRGB(70, 70, 70);
-    const juce::Colour buttonOnColour = juce::Colour::fromRGB(50, 110, 108);
+    const juce::Colour textColour = juce::Colour::fromRGB(255, 255, 255);
+    const juce::Colour rightBgColour = juce::Colour::fromRGB(41, 42, 48);
+    const juce::Colour leftBgColour = juce::Colour::fromRGB(45, 48, 50);
+    const juce::Colour comboBoxColour = juce::Colours::black.withAlpha(0.2f);
+    const juce::Colour popupMenuColour = juce::Colour::fromRGB(32, 33, 38).withAlpha(0.95f);
+    const juce::Colour borderColour = juce::Colour::fromRGB(80, 80, 85);
+    const juce::Colour indicatorColour = juce::Colour::fromRGB(255, 122, 178);
     
     const int mainWindowWidth = 500;
     const int mainWindowHeight = 250;
@@ -45,8 +47,9 @@ private:
     const int boxWidth = 300;
     const int boxHeight = 20;
     const int boxHorzPad = 10;
+    const int indicatorWidth = 10;
     
-    const juce::FlexItem::Margin buttonMargin  = juce::FlexItem::Margin(0, 0, 10, 0);
+    const juce::FlexItem::Margin buttonMargin  = juce::FlexItem::Margin(0, 10, 10, 10);
     const juce::FlexItem::Margin boxMargin  = juce::FlexItem::Margin(20, 0, 10, 0);
     
     juce::FlexBox leftFlexBox, rightFlexBox, keyFlexBox;
@@ -68,6 +71,9 @@ private:
     void setupTheme();
     void setupRectangles();
     void setupFlexBox();
+    void drawRectangles(juce::Graphics& g);
+    void drawButtonText(juce::Graphics& g);
+    void drawIndicator(juce::Graphics& g);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiHarmonizerAudioProcessorEditor)
     

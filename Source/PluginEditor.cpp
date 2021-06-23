@@ -50,14 +50,14 @@ MidiHarmonizerAudioProcessorEditor::~MidiHarmonizerAudioProcessorEditor()
 void MidiHarmonizerAudioProcessorEditor::paint (juce::Graphics& g)
 {
     setupRectangles();
-    g.setColour(leftBgColour);
-    g.fillRect(leftPanel);
-    g.setColour(rightBgColour);
-    g.fillRect(rightPanel);
+    drawRectangles(g);
+    
     leftFlexBox.performLayout(leftPanel.withSizeKeepingCentre(leftPanel.getWidth(),
                                                               leftPanel.getHeight()*4/5));
     rightFlexBox.performLayout(rightPanel.withSizeKeepingCentre(rightPanel.getWidth()-boxHorzPad,
                                                                 rightPanel.getHeight()*4/5));
+    drawButtonText(g);
+    drawIndicator(g);
 }
 
 void MidiHarmonizerAudioProcessorEditor::resized()
@@ -86,7 +86,6 @@ void MidiHarmonizerAudioProcessorEditor::comboBoxChanged(juce::ComboBox *comboBo
 
 void MidiHarmonizerAudioProcessorEditor::setupTransposeButton()
 {
-    transposeButton.setButtonText("Transpose");
     transposeButton.setToggleState(1, juce::dontSendNotification);
     transposeButton.setRadioGroupId(100);
     transposeButton.onClick = [this]
@@ -99,11 +98,11 @@ void MidiHarmonizerAudioProcessorEditor::setupTransposeButton()
         keyMinorMajorBox.setEnabled(0);
         chordFormulaBox.setEnabled(0);
     };
+    transposeButton.setAlpha(0);
 }
 
 void MidiHarmonizerAudioProcessorEditor::setupChordsButton()
 {
-    chordsButton.setButtonText("Chords");
     chordsButton.setToggleState(0, juce::dontSendNotification);
     chordsButton.setRadioGroupId(100);
     chordsButton.onClick = [this]
@@ -116,11 +115,11 @@ void MidiHarmonizerAudioProcessorEditor::setupChordsButton()
         keyMinorMajorBox.setEnabled(0);
         chordFormulaBox.setEnabled(0);
     };
+    chordsButton.setAlpha(0);
 }
 
 void MidiHarmonizerAudioProcessorEditor::setupChordsInKeyButton()
 {
-    chordsInKeyButton.setButtonText("Chords In Key");
     chordsInKeyButton.setToggleState(0, juce::dontSendNotification);
     chordsInKeyButton.setRadioGroupId(100);
     chordsInKeyButton.onClick = [this]
@@ -133,6 +132,7 @@ void MidiHarmonizerAudioProcessorEditor::setupChordsInKeyButton()
         keyMinorMajorBox.setEnabled(1);
         chordFormulaBox.setEnabled(1);
     };
+    chordsInKeyButton.setAlpha(0);
 }
 
 void MidiHarmonizerAudioProcessorEditor::setupTransposeBox()
@@ -218,6 +218,9 @@ void MidiHarmonizerAudioProcessorEditor::setupChordFormulaBox()
 
 void MidiHarmonizerAudioProcessorEditor::setupTheme()
 {
+    getLookAndFeel().setColour(juce::TabbedComponent::ColourIds::backgroundColourId,
+                               juce::Colours::black);
+    
     getLookAndFeel().setColour(juce::ComboBox::outlineColourId,
                                juce::Colours::transparentBlack);
     
@@ -243,22 +246,16 @@ void MidiHarmonizerAudioProcessorEditor::setupTheme()
                                comboBoxColour);
     
     getLookAndFeel().setColour(juce::PopupMenu::backgroundColourId,
-                               rightBgColour.withAlpha(0.8f));
+                               popupMenuColour);
     
     getLookAndFeel().setColour(juce::PopupMenu::highlightedBackgroundColourId,
                                comboBoxColour);
-    
-    getLookAndFeel().setColour(juce::TextButton::buttonColourId,
-                               leftBgColour);
-    
-    getLookAndFeel().setColour(juce::TextButton::buttonOnColourId,
-                               buttonOnColour);
 }
 
 void MidiHarmonizerAudioProcessorEditor::setupRectangles()
 {
-    leftPanel = getBounds().withRight(getWidth()/3);
-    rightPanel = getBounds().withLeft(getWidth()/3);
+    leftPanel = getBounds().withRight(getWidth()/4);
+    rightPanel = getBounds().withLeft(getWidth()/4);
 }
 
 void MidiHarmonizerAudioProcessorEditor::setupFlexBox()
@@ -303,4 +300,73 @@ void MidiHarmonizerAudioProcessorEditor::setupFlexBox()
     rightFlexBox.alignContent = juce::FlexBox::AlignContent::stretch;
     rightFlexBox.items = rightItems;
     
+}
+
+void MidiHarmonizerAudioProcessorEditor::drawRectangles(juce::Graphics& g)
+{
+    g.setColour(leftBgColour);
+    g.fillRect(leftPanel);
+    g.setColour(rightBgColour);
+    g.fillRect(rightPanel);
+    g.setColour(borderColour);
+    g.fillRect(rightPanel.getX(),
+               rightPanel.getY(),
+               1,
+               rightPanel.getHeight());
+    g.setColour(juce::Colours::black);
+    g.fillRect(rightPanel.getX()-1,
+               rightPanel.getY(),
+               1,
+               rightPanel.getHeight());
+}
+
+void MidiHarmonizerAudioProcessorEditor::drawButtonText(juce::Graphics& g)
+{
+    g.setColour(textColour);
+    g.drawText("Transpose",
+               transposeButton.getX() + indicatorWidth*2,
+               transposeButton.getY(),
+               transposeButton.getWidth(),
+               transposeButton.getHeight(),
+               juce::Justification::centredLeft);
+    g.drawText("Chords",
+               chordsButton.getX() + indicatorWidth*2,
+               chordsButton.getY(),
+               chordsButton.getWidth(),
+               chordsButton.getHeight(),
+               juce::Justification::centredLeft);
+    g.drawText("Chords In Key",
+               chordsInKeyButton.getX() + indicatorWidth*2,
+               chordsInKeyButton.getY(),
+               chordsInKeyButton.getWidth(),
+               chordsInKeyButton.getHeight(),
+               juce::Justification::centredLeft);
+}
+
+void MidiHarmonizerAudioProcessorEditor::drawIndicator(juce::Graphics& g)
+{
+    g.setColour(indicatorColour);
+    switch (audioProcessor.myMidiProcessor.getModeID())
+    {
+        case 1:
+            g.fillEllipse(transposeButton.getX(),
+                          transposeButton.getBounds().getCentre().getY()-indicatorWidth/2,
+                          indicatorWidth,
+                          indicatorWidth);
+            break;
+        case 2:
+            g.fillEllipse(chordsButton.getX(),
+                          chordsButton.getBounds().getCentre().getY()-indicatorWidth/2,
+                          indicatorWidth,
+                          indicatorWidth);
+            break;
+        case 3:
+            g.fillEllipse(chordsInKeyButton.getX(),
+                          chordsInKeyButton.getBounds().getCentre().getY()-indicatorWidth/2,
+                          indicatorWidth,
+                          indicatorWidth);
+            break;
+        default:
+            break;
+    }
 }

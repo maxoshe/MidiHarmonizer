@@ -47,6 +47,7 @@ private:
     void chordsInKeyMode();
     
 public:
+    int getModeID() {return modeID;}
     void setModeID(int choice);
     void setSemitones(int choice);
     void setChordTypeID(int choice);
